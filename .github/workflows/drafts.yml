@@ -31,7 +31,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
-        run: github/workflows/generate.py
+          run: python .github/workflows/generate.py 
       - name: Commit drafts only to a review branch
         env:
           GH_TOKEN: ${{ github.token }}
