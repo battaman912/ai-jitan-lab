@@ -4,7 +4,7 @@ import json
 import os
 from pathlib import Path
 from urllib.request import Request, urlopen
-
+from urllib.error import HTTPError
 ROOT = Path(__file__).resolve().parent
 TOPICS = [
     'AIで週次タスクを整理する手順',
@@ -38,8 +38,14 @@ def create_drafts(day=None, request=None):
         payload = json.dumps({'model': model, 'input': prompt, 'store': False}).encode()
         req = Request('https://api.openai.com/v1/responses', data=payload,
                       headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'})
-        with (request or urlopen)(req, timeout=90) as response:
-            result = json.load(response)
+                try:
+            with (request or urlopen)(req, timeout=90) as response:
+                result = json.load(response)
+        except HTTPError as e:
+            error_body = e.read().decode('utf-8', errors='replace')
+            raise RuntimeError(
+                f'OpenAI API error: HTTP {e.code}\n{error_body}'
+            ) from None
         text = '\n'.join(c.get('text', '') for output in result.get('output', [])
                          if output.get('type') == 'message' for c in output.get('content', [])
                          if c.get('type') == 'output_text').strip()
