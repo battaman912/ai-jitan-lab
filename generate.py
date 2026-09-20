@@ -63,4 +63,7 @@ def create_drafts(day=None, request=None):
                      approved=False, rights_checked=False, affiliate_key='',
                      publish_at=f'{day.isoformat()}T09:00:00+09:00')
         filename.write_text(json.dumps(draft, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-        print('Draft created:', filename.name.
+    print('Draft created:', filename.name)
+
+if __name__ == "__main__":
+    create_drafts()
