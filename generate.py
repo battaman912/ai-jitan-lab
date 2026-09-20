@@ -38,7 +38,7 @@ def create_drafts(day=None, request=None):
         payload = json.dumps({'model': model, 'input': prompt, 'store': False}).encode()
         req = Request('https://api.openai.com/v1/responses', data=payload,
                       headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'})
-        try:
+            try:
             opener = request or urlopen
             with opener(req, timeout=90) as response:
                 result = json.load(response)
