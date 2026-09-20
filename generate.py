@@ -38,13 +38,17 @@ def create_drafts(day=None, request=None):
         payload = json.dumps({'model': model, 'input': prompt, 'store': False}).encode()
         req = Request('https://api.openai.com/v1/responses', data=payload,
                       headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'})
-                try:
-            with (request or urlopen)(req, timeout=90) as response:
+        try:
+            opener = request or urlopen
+            with opener(req, timeout=90) as response:
                 result = json.load(response)
         except HTTPError as e:
-            error_body = e.read().decode('utf-8', errors='replace')
+            error_body = e.read().decode(
+                'utf-8', errors='replace'
+            )
             raise RuntimeError(
-                f'OpenAI API error: HTTP {e.code}\n{error_body}'
+                f'OpenAI API error: HTTP {e.code}\n'
+                f'{error_body}'
             ) from None
         text = '\n'.join(c.get('text', '') for output in result.get('output', [])
                          if output.get('type') == 'message' for c in output.get('content', [])
@@ -59,7 +63,4 @@ def create_drafts(day=None, request=None):
                      approved=False, rights_checked=False, affiliate_key='',
                      publish_at=f'{day.isoformat()}T09:00:00+09:00')
         filename.write_text(json.dumps(draft, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-        print('Draft created:', filename.name)
-
-if __name__ == '__main__':
-    create_drafts()
+        print('Draft created:', filename.name.
